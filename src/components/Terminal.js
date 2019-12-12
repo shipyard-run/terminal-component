@@ -1,16 +1,17 @@
-import React, {useEffect, useRef} from "react";
-import { Terminal as XTerm } from "xterm";
-import { FitAddon } from "xterm-addon-fit";
-import { WebglAddon } from 'xterm-addon-webgl';
-import { AttachAddon } from 'xterm-addon-attach';
+import React, {useEffect, useRef} from "react"
+import PropTypes from 'prop-types'
+import { Terminal as XTerm } from "xterm"
+import { FitAddon } from "xterm-addon-fit"
+import { WebglAddon } from 'xterm-addon-webgl'
+import { AttachAddon } from 'xterm-addon-attach'
 
-import "./terminal.css";
+import "./terminal.css"
 
-export const Terminal = ({ host, port }) => {
-    const container = useRef();
-    const terminal = useRef();
-
-    const websocket = new WebSocket(`ws://${host}:${port}/terminal`)
+export const Terminal = ({ target, workdir = '/', user = 'root', shell = '/bin/sh' }) => {
+    const container = useRef()
+    const terminal = useRef()
+    
+    const websocket = new WebSocket(`ws://localhost:27950/terminal?target=${target}&workdir=${workdir}&user=${user}&shell=${shell}`)
     websocket.binaryType = 'arraybuffer'
 
     useEffect(() => {
@@ -25,9 +26,16 @@ export const Terminal = ({ host, port }) => {
         })
 
         terminal.current.onData(data => websocket.send(new TextEncoder().encode("\x00" + data)))
-    }, [host, port, websocket])
+    }, [websocket])
 
     return (
-        <div ref={container} style={{ height: "100%", width: "100%" }} />
+        <div ref={container} />
     )
 }
+
+Terminal.propTypes = {
+    target: PropTypes.string.isRequired,
+    workdir: PropTypes.string,
+    user: PropTypes.string,
+    shell: PropTypes.string
+  }

@@ -1,5 +1,5 @@
 Terminal example:
 
 ```js
-<Terminal host="localhost" port={27950} />
+<Terminal target="ubuntu.wan.shipyard" workdir="/etc" user="erik" shell="/bin/bash" />
 ```

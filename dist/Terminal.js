@@ -4,15 +4,12 @@ import { FitAddon } from "xterm-addon-fit";
 import { WebglAddon } from 'xterm-addon-webgl';
 import { AttachAddon } from 'xterm-addon-attach';
 import "./terminal.css";
-export const Terminal = ({
-  host,
-  port
-}) => {
+export const Terminal = () => {
   const container = useRef();
   const terminal = useRef();
-  const websocket = new WebSocket(`ws://${host}:${port}/terminal`);
-  websocket.binaryType = 'arraybuffer';
   useEffect(() => {
+    const websocket = new WebSocket(`ws://localhost:27950/terminal`);
+    websocket.binaryType = 'arraybuffer';
     terminal.current = new XTerm();
     terminal.current.loadAddon(new AttachAddon(websocket));
     terminal.current.open(container.current);
@@ -23,12 +20,8 @@ export const Terminal = ({
       fitAddon.fit();
     });
     terminal.current.onData(data => websocket.send(new TextEncoder().encode("\x00" + data)));
-  }, [host, port, websocket]);
+  }, [websocket]);
   return React.createElement("div", {
-    ref: container,
-    style: {
-      height: "100%",
-      width: "100%"
-    }
+    ref: container
   });
 };

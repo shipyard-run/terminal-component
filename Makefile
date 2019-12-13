@@ -1,5 +1,7 @@
 .PHONY: components publish
 
+all: components publish
+
 components:
 	npm run publish:npm
 

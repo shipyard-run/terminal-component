@@ -1,5 +1,5 @@
-Terminal example:
+Some explanation!
 
 ```js
-<Terminal target="ubuntu.wan.shipyard" workdir="/etc" user="erik" shell="/bin/bash" />
+<Terminal target="ubuntu.wan.shipyard" shell="/bin/bash" />
 ```

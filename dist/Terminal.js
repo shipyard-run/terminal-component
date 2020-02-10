@@ -1,25 +1,24 @@
-import React, { useEffect, useRef } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import PropTypes from 'prop-types';
 import { Terminal as XTerm } from "xterm";
 import { FitAddon } from "xterm-addon-fit";
-import { WebglAddon } from 'xterm-addon-webgl';
 import { AttachAddon } from 'xterm-addon-attach';
 import "./terminal.css";
 
-const Terminal = ({
+const Term = ({
   target,
-  workdir = '/',
-  user = 'root',
-  shell = '/bin/sh'
+  workdir,
+  user,
+  shell
 }) => {
   const container = useRef();
   const terminal = useRef();
   useEffect(() => {
     const websocket = new WebSocket(`ws://localhost:27950/terminal?target=${target}&workdir=${workdir}&user=${user}&shell=${shell}`);
-    websocket.binaryType = 'arraybuffer';
-    const fitAddon = new FitAddon();
+    websocket.binaryType = 'arraybuffer'; // Create the terminal
+
     terminal.current = new XTerm({
-      fontFamily: 'Hack',
+      fontFamily: 'Hack, Droid Sans Mono, Monospace',
       fontSize: 14,
       lineHeight: 1.1,
       theme: {
@@ -43,14 +42,12 @@ const Terminal = ({
         "white": "#FFFFFF",
         "yellow": "#ADDB67"
       }
-    }); // Attach to the shell
+    }); // Load addons
 
-    terminal.current.loadAddon(new AttachAddon(websocket)); // Create the terminal
-
-    terminal.current.open(container.current); // Enable WebGL
-
-    terminal.current.loadAddon(new WebglAddon());
+    const fitAddon = new FitAddon();
+    terminal.current.loadAddon(new AttachAddon(websocket));
     terminal.current.loadAddon(fitAddon);
+    terminal.current.open(container.current);
     terminal.current.onRender(() => {
       fitAddon.fit();
     }); // Encode our messages to the server
@@ -60,6 +57,25 @@ const Terminal = ({
   return React.createElement("div", {
     ref: container
   });
+};
+
+const Terminal = ({
+  target,
+  workdir = '/',
+  user = 'root',
+  shell = '/bin/sh',
+  placeholder = 'Click to open terminal'
+}) => {
+  const [show, setShow] = useState(false);
+  return React.createElement(React.Fragment, null, show ? React.createElement(Term, {
+    target: target,
+    workdir: workdir,
+    user: user,
+    shell: shell
+  }) : React.createElement("div", {
+    className: "placeholder",
+    onClick: () => setShow(true)
+  }, placeholder));
 };
 
 export default Terminal;

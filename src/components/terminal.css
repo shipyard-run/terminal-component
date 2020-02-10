@@ -35,6 +35,25 @@
  *  Default styles for xterm.js
  */
 
+.icon {
+    display: inline-block;
+    font-size: inherit;
+    height: 1em;
+    overflow: visible;
+    vertical-align: -0.125em;
+    margin-right: 5px;
+}
+
+ .placeholder {
+    background-color: #011627;
+    font-family: 'Hack', 'Droid Sans Mono', Monospace;
+    font-size: 14px;
+    line-height: 1.1em;
+    color: #D6DEEB;
+    padding: 10px;
+    cursor: pointer;
+ }
+
  .xterm {
     font-family: "Droid Sans Mono", monospace;
     font-weight: 400;

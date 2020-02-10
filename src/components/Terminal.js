@@ -1,26 +1,25 @@
-import React, {useEffect, useRef} from "react"
+import React, {useEffect, useRef, useState} from "react"
 import PropTypes from 'prop-types'
 import { Terminal as XTerm } from "xterm"
 import { FitAddon } from "xterm-addon-fit"
-import { WebglAddon } from 'xterm-addon-webgl'
 import { AttachAddon } from 'xterm-addon-attach'
 
 import "./terminal.css"
 
-const Terminal = ({ target, workdir = '/', user = 'root', shell = '/bin/sh' }) => {
+const Term = ({ target, workdir, user, shell }) => {
     const container = useRef()
     const terminal = useRef()
-
+    
     useEffect(() => {
         const websocket = new WebSocket(`ws://localhost:27950/terminal?target=${target}&workdir=${workdir}&user=${user}&shell=${shell}`)
         websocket.binaryType = 'arraybuffer'
-
-        const fitAddon = new FitAddon()
-
+        
+        // Create the terminal
         terminal.current = new XTerm({
-            fontFamily: 'Hack',
+            fontFamily: 'Hack, Droid Sans Mono, Monospace',
             fontSize: 14,
             lineHeight: 1.1,
+            cursorBlink: true,
             theme: { 
                 "background": "#011627",
                 "black": "#011627",
@@ -44,16 +43,13 @@ const Terminal = ({ target, workdir = '/', user = 'root', shell = '/bin/sh' }) =
             }
         })
         
-        // Attach to the shell
+        // Load addons
+        const fitAddon = new FitAddon()
         terminal.current.loadAddon(new AttachAddon(websocket))
-        
-        // Create the terminal
-        terminal.current.open(container.current)
-        
-        // Enable WebGL
-        terminal.current.loadAddon(new WebglAddon())
         terminal.current.loadAddon(fitAddon)
-        
+
+        terminal.current.open(container.current)
+
         terminal.current.onRender(() => {
             fitAddon.fit()
         })
@@ -64,6 +60,17 @@ const Terminal = ({ target, workdir = '/', user = 'root', shell = '/bin/sh' }) =
 
     return (
         <div ref={container} />
+    )
+}
+
+const Terminal = ({ target, workdir = '/', user = 'root', shell = '/bin/sh', placeholder = 'click to expand terminal', expanded = false }) => {
+    const [ show, setShow ] = useState(expanded)
+    return (
+        <>
+            {show ? <Term target={target} workdir={workdir} user={user} shell={shell} /> : <div className="placeholder"  onClick={() => setShow(true)}>
+            <svg className="icon" aria-hidden="true" focusable="false" viewBox="0 0 640 512"><path fill="#ADDB67" d="M257.981 272.971L63.638 467.314c-9.373 9.373-24.569 9.373-33.941 0L7.029 444.647c-9.357-9.357-9.375-24.522-.04-33.901L161.011 256 6.99 101.255c-9.335-9.379-9.317-24.544.04-33.901l22.667-22.667c9.373-9.373 24.569-9.373 33.941 0L257.981 239.03c9.373 9.372 9.373 24.568 0 33.941zM640 456v-32c0-13.255-10.745-24-24-24H312c-13.255 0-24 10.745-24 24v32c0 13.255 10.745 24 24 24h304c13.255 0 24-10.745 24-24z" class=""></path></svg>                {placeholder}
+            </div>}
+        </>
     )
 }
 

@@ -9,9 +9,17 @@ import "./terminal.css"
 const Term = ({ target, workdir, user, shell }) => {
     const container = useRef()
     const terminal = useRef()
-    
+   
+    function createWebSocket(path) {
+        var protocolPrefix = (window.location.protocol === 'https:') ? 'wss:' : 'ws:';
+        var addr = protocolPrefix + '//' + location.host + path
+        console.log("Websocket loc:" + addr);
+        return new WebSocket(addr);
+    }     
+
     useEffect(() => {
-        const websocket = new WebSocket(`ws://localhost:27950/terminal?target=${target}&workdir=${workdir}&user=${user}&shell=${shell}`)
+        // get the address from the current browser address
+        const websocket = createWebSocket(`/terminal?target=${target}&workdir=${workdir}&user=${user}&shell=${shell}`)
         websocket.binaryType = 'arraybuffer'
         
         // Create the terminal

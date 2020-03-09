@@ -25,7 +25,11 @@ const Term = ({
   useEffect(() => {
     // get the address from the current browser address
     const websocket = createWebSocket(`/terminal?target=${target}&workdir=${workdir}&user=${user}&shell=${shell}`);
-    websocket.binaryType = 'arraybuffer'; // Create the terminal
+    websocket.binaryType = 'arraybuffer'; // set a regular heart beat 
+
+    setInterval(f => {
+      websocket.send(new TextEncoder().encode("\x09"));
+    }, 10000); // Create the terminal
 
     terminal.current = new XTerm({
       fontFamily: 'Hack, Droid Sans Mono, Monospace',

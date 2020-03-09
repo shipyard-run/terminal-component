@@ -3,6 +3,7 @@ import PropTypes from 'prop-types';
 import { Terminal as XTerm } from "xterm";
 import { FitAddon } from "xterm-addon-fit";
 import { AttachAddon } from 'xterm-addon-attach';
+import ReconnectingWebSocket from 'reconnecting-websocket';
 import "./terminal.css";
 
 const Term = ({
@@ -18,7 +19,7 @@ const Term = ({
     var protocolPrefix = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
     var addr = protocolPrefix + '//' + location.host + path;
     console.log("Websocket loc:" + addr);
-    return new WebSocket(addr);
+    return new ReconnectingWebSocket(addr);
   }
 
   useEffect(() => {
